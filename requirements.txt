@@ -186,7 +186,6 @@ pydocstyle==6.3.0
 pydotplus==2.0.2
 pydub==0.25.1
 pyflakes==3.2.0
-pygame==2.6.1
 PyGithub==2.8.1
 Pygments==2.19.2
 pyinstaller==6.18.0
