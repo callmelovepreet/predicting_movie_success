@@ -28,7 +28,7 @@
     @keyframes spin { to { transform:rotate(360deg); } }
     @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.7); } }
 
-    .container { position:relative; z-index:1; max-width:960px; margin:0 auto; padding:56px 24px 80px; }
+    .container { position:relative; z-index:1; max-width:980px; margin:0 auto; padding:56px 24px 80px; }
 
     header { margin-bottom:52px; animation:fadeUp .7s ease both; }
     .badge {
@@ -89,18 +89,31 @@
     .card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px; margin-bottom:20px; animation:fadeUp .7s .2s ease both; transition:border-color .3s; }
     .card:hover { border-color:rgba(245,197,24,0.15); }
 
+    /* Section headers inside card */
+    .input-section { margin-bottom:24px; }
+    .input-section-title {
+      font-family:'Syne',sans-serif; font-size:10px; font-weight:600;
+      letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
+      margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid var(--border);
+    }
+
     /* Feature grid */
-    .feature-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(165px,1fr)); gap:10px 12px; margin-bottom:8px; }
+    .feature-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(175px,1fr)); gap:10px 12px; }
     .feature-wrap { display:flex; flex-direction:column; gap:5px; }
     .feature-label { font-size:9px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted2); display:flex; align-items:center; gap:5px; }
+    .feature-hint { font-size:9px; color:var(--muted); margin-top:2px; }
     .feature-input, .feature-select {
       background:var(--bg); border:1px solid var(--border);
       border-radius:8px; padding:9px 10px;
       color:var(--text); font-family:'DM Mono',monospace; font-size:12px;
-      width:100%; outline:none; transition:border-color .2s, box-shadow .2s; -webkit-appearance:none;
+      width:100%; outline:none; transition:border-color .2s, box-shadow .2s;
     }
-    .feature-select { cursor:pointer; }
+    .feature-select { cursor:pointer; -webkit-appearance:none; appearance:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23718096'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:right 10px center; padding-right:28px;
+    }
     .feature-input:focus, .feature-select:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(245,197,24,0.1); }
+    .feature-select option { background:#0d1018; color:#e8edf5; }
 
     /* Buttons */
     .btn-row { display:flex; gap:10px; margin-top:24px; flex-wrap:wrap; }
@@ -136,6 +149,8 @@
     .fill-flop { background:linear-gradient(90deg,#ef4444,#fca5a5); }
     .prob-pct { font-size:12px; font-weight:500; color:var(--text); width:44px; text-align:right; }
 
+    .bias-note { background:rgba(245,197,24,0.06); border:1px solid rgba(245,197,24,0.15); border-radius:10px; padding:10px 14px; font-size:11px; color:var(--muted2); margin-top:16px; }
+
     @media(max-width:600px) {
       .examples-row { grid-template-columns:1fr; }
       .stats { flex-wrap:wrap; }
@@ -165,35 +180,59 @@
   </div>
 
   <!-- Example movies -->
-  <div class="section-title">Quick Examples — Click to Auto-Fill & Predict</div>
+  <div class="section-title">Quick Examples — Click to Auto-Fill</div>
   <div class="examples-row">
     <div class="example-card" onclick="fillExample(0)">
       <div class="ex-fill-btn">Auto-fill ↗</div>
       <div class="ex-icon">🏆</div>
       <div class="ex-title">Avatar (2009)</div>
-      <div class="ex-desc">Mega-budget sci-fi blockbuster. $237M budget, $760M gross, 1.2M votes, 33K movie FB likes.</div>
+      <div class="ex-desc">Mega-budget sci-fi blockbuster. $237M budget, $760M gross, 1.2M votes.</div>
       <span class="ex-tag tag-hit">Expected: Hit</span>
     </div>
     <div class="example-card" onclick="fillExample(1)">
       <div class="ex-fill-btn">Auto-fill ↗</div>
       <div class="ex-icon">🎭</div>
       <div class="ex-title">Mid-Budget Drama</div>
-      <div class="ex-desc">Modest drama with decent reviews, limited social buzz, $8M budget, $12M gross.</div>
+      <div class="ex-desc">Modest drama with decent reviews, limited social buzz, $8M budget.</div>
       <span class="ex-tag tag-avg">Expected: Average</span>
     </div>
     <div class="example-card" onclick="fillExample(2)">
       <div class="ex-fill-btn">Auto-fill ↗</div>
       <div class="ex-icon">💀</div>
       <div class="ex-title">Low-Budget Horror</div>
-      <div class="ex-desc">Poorly received horror with minimal votes, no social presence, $1.2M budget, $900K gross.</div>
+      <div class="ex-desc">Poorly received horror, minimal votes, no social presence, $1.2M budget.</div>
       <span class="ex-tag tag-flop">Expected: Flop</span>
     </div>
   </div>
 
   <!-- Input card -->
   <div class="card">
-    <div class="section-title">26 Feature Inputs</div>
-    <div class="feature-grid" id="featureGrid"></div>
+    <div class="section-title">Movie Feature Inputs</div>
+
+    <!-- Section 1: Basic Info -->
+    <div class="input-section">
+      <div class="input-section-title">🎬 Basic Information</div>
+      <div class="feature-grid" id="gridBasic"></div>
+    </div>
+
+    <!-- Section 2: Social & Reviews -->
+    <div class="input-section">
+      <div class="input-section-title">📊 Social Media & Reviews</div>
+      <div class="feature-grid" id="gridSocial"></div>
+    </div>
+
+    <!-- Section 3: Financial -->
+    <div class="input-section">
+      <div class="input-section-title">💰 Financial Data</div>
+      <div class="feature-grid" id="gridFinancial"></div>
+    </div>
+
+    <!-- Section 4: Genres -->
+    <div class="input-section">
+      <div class="input-section-title">🎭 Genre Types</div>
+      <div class="feature-grid" id="gridGenre"></div>
+    </div>
+
     <div class="error-msg" id="errorMsg"></div>
     <div class="btn-row">
       <button class="btn btn-primary" id="predictBtn" onclick="runPredict()">
@@ -216,96 +255,160 @@
     </div>
     <div class="prob-title">Confidence per Class</div>
     <div class="prob-bars" id="probBars"></div>
+    <div class="bias-note">⚠️ Note: The model was trained on imbalanced data (Hit: 68%, Average: 30%, Flop: 1%). Flop predictions may be underrepresented. Apply SMOTE in training to improve Flop recall.</div>
   </div>
 
 </div>
 
 <script>
-// ── 26 Features (exact order after preprocessing in notebook) ──
-const FEATURES = [
-  { key:'color',                     label:'Color',                    type:'select', options:[['Color','1'],['Black & White','0']] },
-  { key:'num_critic_for_reviews',    label:'Critic Reviews',            type:'number', placeholder:'140',        hint:'Number of critical reviews on IMDB (e.g. 50–813)' },
-  { key:'duration',                  label:'Duration (min)',              type:'number', placeholder:'107',        hint:'Movie duration in minutes (e.g. 60–511)' },
-  { key:'director_facebook_likes',   label:'Director FB Likes',        type:'number', placeholder:'686',        hint:'Director Facebook page likes (e.g. 0–23000)' },
-  { key:'actor_3_facebook_likes',    label:'Actor 3 FB Likes',         type:'number', placeholder:'645',        hint:'3rd actor Facebook likes (e.g. 0–23000)' },
-  { key:'gross',                     label:'Gross Earnings ($)',        type:'number', placeholder:'48468412',   hint:'Box office gross in USD' },
-  { key:'genre_type1',               label:'Genre Type 1',             type:'number', placeholder:'6',          hint:'Primary genre (label encoded 0–20)' },
-  { key:'genre_type2',               label:'Genre Type 2',             type:'number', placeholder:'0',          hint:'Secondary genre (0 if none)' },
-  { key:'genre_type3',               label:'Genre Type 3',             type:'number', placeholder:'7',          hint:'Tertiary genre (0 if none)' },
-  { key:'genre_type4',               label:'Genre Type 4',             type:'number', placeholder:'0',          hint:'4th genre type (0 if none)' },
-  { key:'genre_type5',               label:'Genre Type 5',             type:'number', placeholder:'0',          hint:'5th genre type (0 if none)' },
-  { key:'genre_type6',               label:'Genre Type 6',             type:'number', placeholder:'0',          hint:'6th genre type (0 if none)' },
-  { key:'genre_type7',               label:'Genre Type 7',             type:'number', placeholder:'0',          hint:'7th genre type (0 if none)' },
-  { key:'genre_type8',               label:'Genre Type 8',             type:'number', placeholder:'0',          hint:'8th genre type (0 if none)' },
-  { key:'num_voted_users',           label:'Voted Users',               type:'number', placeholder:'83668',      hint:'Number of IMDB votes (e.g. 5–1,689,764)' },
-  { key:'cast_total_facebook_likes', label:'Cast Total FB Likes',      type:'number', placeholder:'9699',       hint:'Total Facebook likes of entire cast' },
-  { key:'facenumber_in_poster',      label:'Faces in Poster',           type:'number', placeholder:'1',          hint:'Number of actor faces in movie poster (0–43)' },
-  { key:'num_user_for_reviews',      label:'User Reviews',             type:'number', placeholder:'273',        hint:'Number of user reviews on IMDB (1–5060)' },
-  { key:'language',                  label:'Language',                 type:'number', placeholder:'11',         hint:'Language label encoded (English≈11, 0–45)' },
-  { key:'country',                   label:'Country',                  type:'number', placeholder:'62',         hint:'Country label encoded (USA≈62, 0–64)' },
-  { key:'content_rating',            label:'Content Rating',           type:'number', placeholder:'7',          hint:'Content rating label encoded (R≈3, PG-13≈7, 0–17)' },
-  { key:'budget',                    label:'Budget ($)',                type:'number', placeholder:'39752624',   hint:'Production budget in USD' },
-  { key:'title_year',                label:'Release Year',             type:'number', placeholder:'2002',       hint:'Year of release (1916–2016)' },
-  { key:'actor_2_facebook_likes',    label:'Actor 2 FB Likes',         type:'number', placeholder:'1652',       hint:'2nd actor Facebook likes (0–137000)' },
-  { key:'aspect_ratio',              label:'Aspect Ratio',             type:'number', placeholder:'2.35',       hint:'Film aspect ratio (e.g. 1.33, 1.85, 2.35)' },
-  { key:'movie_facebook_likes',      label:'Movie FB Likes',           type:'number', placeholder:'7526',       hint:'Movie Facebook page likes (0–349,000)' },
+// ── Genre options (label encoded from LabelEncoder in notebook) ──
+const GENRE_OPTIONS = [
+  ['None / Other', '0'],['Action','1'],['Adventure','2'],['Animation','3'],
+  ['Biography','4'],['Comedy','5'],['Crime','6'],['Documentary','7'],
+  ['Drama','8'],['Fantasy','9'],['Horror','10'],['Music','11'],
+  ['Musical','12'],['Mystery','13'],['Romance','14'],['Sci-Fi','15'],
+  ['Sport','16'],['Thriller','17'],['War','18'],['Western','19'],['Family','20']
 ];
 
-// ── 3 Pre-filled examples ──
+// ── Language options (approximate label encoding, English=11) ──
+const LANGUAGE_OPTIONS = [
+  ['English', '11'], ['Hindi', '7'], ['French', '5'], ['Spanish', '20'],
+  ['German', '6'], ['Japanese', '10'], ['Mandarin', '14'], ['Italian', '9'],
+  ['Korean', '12'], ['Portuguese', '16'], ['Arabic', '0'], ['Russian', '18'],
+  ['Other', '3']
+];
+
+// ── Country options (approximate label encoding, USA=62) ──
+const COUNTRY_OPTIONS = [
+  ['USA', '62'], ['India', '8'], ['UK', '60'], ['France', '5'],
+  ['Germany', '6'], ['Australia', '1'], ['Canada', '3'], ['Japan', '10'],
+  ['China', '4'], ['South Korea', '22'], ['Italy', '9'], ['Spain', '21'],
+  ['Brazil', '2'], ['Mexico', '14'], ['Russia', '19'], ['Other', '0']
+];
+
+// ── Content Rating options ──
+const RATING_OPTIONS = [
+  ['G', '2'], ['PG', '6'], ['PG-13', '7'], ['R', '3'],
+  ['NC-17', '5'], ['Not Rated', '8'], ['Unrated', '4'], ['TV-14', '0'],
+  ['TV-MA', '1']
+];
+
+// ── Feature definitions organized by section ──
+// key, label, type, placeholder, hint, options (for select)
+const FEATURES_BASIC = [
+  { key:'color',          label:'Color Format',      type:'select',  options:[['Color','1'],['Black & White','0']] },
+  { key:'duration',       label:'Duration (min)',     type:'number',  placeholder:'107', hint:'60 – 511 mins' },
+  { key:'title_year',     label:'Release Year',       type:'number',  placeholder:'2009', hint:'1916 – 2016' },
+  { key:'language',       label:'Language',           type:'select',  options: LANGUAGE_OPTIONS },
+  { key:'country',        label:'Country',            type:'select',  options: COUNTRY_OPTIONS },
+  { key:'content_rating', label:'Content Rating',     type:'select',  options: RATING_OPTIONS },
+  { key:'aspect_ratio',   label:'Aspect Ratio',       type:'number',  placeholder:'2.35', hint:'e.g. 1.33, 1.78, 1.85, 2.35' },
+  { key:'facenumber_in_poster', label:'Faces in Poster', type:'number', placeholder:'1', hint:'0 – 43' },
+];
+
+const FEATURES_SOCIAL = [
+  { key:'num_critic_for_reviews',    label:'Critic Reviews',       type:'number', placeholder:'140',   hint:'No. of critic reviews (50–813)' },
+  { key:'num_user_for_reviews',      label:'User Reviews',         type:'number', placeholder:'272',   hint:'No. of user reviews (1–5060)' },
+  { key:'num_voted_users',           label:'IMDB Votes',           type:'number', placeholder:'83668', hint:'No. of IMDB voters' },
+  { key:'director_facebook_likes',   label:'Director FB Likes',    type:'number', placeholder:'686',   hint:'Director Facebook page likes' },
+  { key:'actor_2_facebook_likes',    label:'Actor 2 FB Likes',     type:'number', placeholder:'1652',  hint:'2nd lead actor FB likes' },
+  { key:'actor_3_facebook_likes',    label:'Actor 3 FB Likes',     type:'number', placeholder:'645',   hint:'3rd actor FB likes' },
+  { key:'cast_total_facebook_likes', label:'Cast Total FB Likes',  type:'number', placeholder:'9699',  hint:'Total FB likes of all cast' },
+  { key:'movie_facebook_likes',      label:'Movie FB Likes',       type:'number', placeholder:'7525',  hint:'Movie page FB likes' },
+];
+
+const FEATURES_FINANCIAL = [
+  { key:'gross',   label:'Gross Earnings ($)', type:'number', placeholder:'48468412',  hint:'Total box office gross in USD' },
+  { key:'budget',  label:'Production Budget ($)', type:'number', placeholder:'39752624', hint:'Total production budget in USD' },
+];
+
+const FEATURES_GENRE = [
+  { key:'genre_type1', label:'Primary Genre',   type:'select', options: GENRE_OPTIONS },
+  { key:'genre_type2', label:'Genre 2',         type:'select', options: GENRE_OPTIONS },
+  { key:'genre_type3', label:'Genre 3',         type:'select', options: GENRE_OPTIONS },
+  { key:'genre_type4', label:'Genre 4',         type:'select', options: GENRE_OPTIONS },
+  { key:'genre_type5', label:'Genre 5',         type:'select', options: GENRE_OPTIONS },
+  { key:'genre_type6', label:'Genre 6',         type:'select', options: GENRE_OPTIONS },
+  { key:'genre_type7', label:'Genre 7',         type:'select', options: GENRE_OPTIONS },
+  { key:'genre_type8', label:'Genre 8',         type:'select', options: GENRE_OPTIONS },
+];
+
+// Flat ordered list for prediction (must match training order exactly)
+const FEATURE_ORDER = [
+  'color','num_critic_for_reviews','duration','director_facebook_likes',
+  'actor_3_facebook_likes','gross',
+  'genre_type1','genre_type2','genre_type3','genre_type4',
+  'genre_type5','genre_type6','genre_type7','genre_type8',
+  'num_voted_users','cast_total_facebook_likes','facenumber_in_poster',
+  'num_user_for_reviews','language','country','content_rating',
+  'budget','title_year','actor_2_facebook_likes','aspect_ratio','movie_facebook_likes'
+];
+
+function buildGrid(containerId, features) {
+  const grid = document.getElementById(containerId);
+  features.forEach(f => {
+    const wrap = document.createElement('div');
+    wrap.className = 'feature-wrap';
+    if (f.type === 'select') {
+      wrap.innerHTML = `
+        <label class="feature-label">${f.label}</label>
+        <select class="feature-select" id="f_${f.key}">
+          ${f.options.map(([l,v]) => `<option value="${v}">${l}</option>`).join('')}
+        </select>`;
+    } else {
+      wrap.innerHTML = `
+        <label class="feature-label">${f.label}</label>
+        <input class="feature-input" id="f_${f.key}" type="number" step="any" placeholder="${f.placeholder}"/>
+        ${f.hint ? `<span class="feature-hint">${f.hint}</span>` : ''}`;
+    }
+    grid.appendChild(wrap);
+  });
+}
+
+buildGrid('gridBasic',     FEATURES_BASIC);
+buildGrid('gridSocial',    FEATURES_SOCIAL);
+buildGrid('gridFinancial', FEATURES_FINANCIAL);
+buildGrid('gridGenre',     FEATURES_GENRE);
+
+// ── 3 Example presets ──
 const EXAMPLES = [
   // Avatar (2009) — Hit
   {
     color:'1', num_critic_for_reviews:'723', duration:'178', director_facebook_likes:'0',
-    actor_3_facebook_likes:'855', gross:'760505847', genre_type1:'0', genre_type2:'0',
-    genre_type3:'7', genre_type4:'20', genre_type5:'0', genre_type6:'0', genre_type7:'0', genre_type8:'0',
+    actor_3_facebook_likes:'855', gross:'760505847',
+    genre_type1:'15', genre_type2:'1', genre_type3:'7', genre_type4:'20',
+    genre_type5:'0', genre_type6:'0', genre_type7:'0', genre_type8:'0',
     num_voted_users:'1200000', cast_total_facebook_likes:'4834', facenumber_in_poster:'0',
     num_user_for_reviews:'3054', language:'11', country:'62', content_rating:'7',
     budget:'237000000', title_year:'2009', actor_2_facebook_likes:'936', aspect_ratio:'1.78', movie_facebook_likes:'33000'
   },
-  // Mid-budget Drama — Average
+  // Mid-Budget Drama — Average
   {
     color:'1', num_critic_for_reviews:'55', duration:'98', director_facebook_likes:'30',
-    actor_3_facebook_likes:'120', gross:'12000000', genre_type1:'5', genre_type2:'0',
-    genre_type3:'0', genre_type4:'0', genre_type5:'0', genre_type6:'0', genre_type7:'0', genre_type8:'0',
+    actor_3_facebook_likes:'120', gross:'12000000',
+    genre_type1:'8', genre_type2:'0', genre_type3:'0', genre_type4:'0',
+    genre_type5:'0', genre_type6:'0', genre_type7:'0', genre_type8:'0',
     num_voted_users:'18000', cast_total_facebook_likes:'1200', facenumber_in_poster:'1',
-    num_user_for_reviews:'90', language:'11', country:'62', content_rating:'9',
+    num_user_for_reviews:'90', language:'11', country:'62', content_rating:'7',
     budget:'8000000', title_year:'2010', actor_2_facebook_likes:'400', aspect_ratio:'1.85', movie_facebook_likes:'500'
   },
   // Low-Budget Horror — Flop
   {
     color:'1', num_critic_for_reviews:'12', duration:'84', director_facebook_likes:'5',
-    actor_3_facebook_likes:'40', gross:'900000', genre_type1:'9', genre_type2:'0',
-    genre_type3:'0', genre_type4:'0', genre_type5:'0', genre_type6:'0', genre_type7:'0', genre_type8:'0',
+    actor_3_facebook_likes:'40', gross:'900000',
+    genre_type1:'10', genre_type2:'0', genre_type3:'0', genre_type4:'0',
+    genre_type5:'0', genre_type6:'0', genre_type7:'0', genre_type8:'0',
     num_voted_users:'3200', cast_total_facebook_likes:'300', facenumber_in_poster:'2',
     num_user_for_reviews:'25', language:'11', country:'62', content_rating:'3',
     budget:'1200000', title_year:'2004', actor_2_facebook_likes:'100', aspect_ratio:'1.85', movie_facebook_likes:'120'
   }
 ];
 
-// ── Build grid ──
-const grid = document.getElementById('featureGrid');
-FEATURES.forEach(f => {
-  const wrap = document.createElement('div');
-  wrap.className = 'feature-wrap';
-  if (f.type === 'select') {
-    wrap.innerHTML = `
-      <label class="feature-label">${f.icon} ${f.label}</label>
-      <select class="feature-select" id="f_${f.key}">
-        ${f.options.map(([l,v]) => `<option value="${v}">${l}</option>`).join('')}
-      </select>`;
-  } else {
-    wrap.innerHTML = `
-      <label class="feature-label">${f.icon} ${f.label}</label>
-      <input class="feature-input" id="f_${f.key}" type="number" step="any" placeholder="${f.placeholder}" title="${f.hint}"/>`;
-  }
-  grid.appendChild(wrap);
-});
-
 function fillExample(idx) {
   const ex = EXAMPLES[idx];
-  FEATURES.forEach(f => {
-    const el = document.getElementById('f_' + f.key);
-    if (el && ex[f.key] !== undefined) el.value = ex[f.key];
+  Object.keys(ex).forEach(key => {
+    const el = document.getElementById('f_' + key);
+    if (el) el.value = ex[key];
   });
   hideError();
   document.getElementById('resultCard').classList.remove('visible');
@@ -313,7 +416,10 @@ function fillExample(idx) {
 }
 
 function clearAll() {
-  FEATURES.forEach(f => { const el = document.getElementById('f_' + f.key); if (el) el.value = ''; });
+  [...FEATURES_BASIC, ...FEATURES_SOCIAL, ...FEATURES_FINANCIAL, ...FEATURES_GENRE].forEach(f => {
+    const el = document.getElementById('f_' + f.key);
+    if (el) el.value = '';
+  });
   document.getElementById('resultCard').classList.remove('visible');
   hideError();
 }
@@ -330,16 +436,23 @@ async function runPredict() {
   hideError();
   const features = [];
   const missing = [];
-  FEATURES.forEach(f => {
-    const el = document.getElementById('f_' + f.key);
+
+  FEATURE_ORDER.forEach(key => {
+    const el = document.getElementById('f_' + key);
     const v = el ? el.value : '';
-    if (v === '') { missing.push(f.label); features.push(0); }
-    else features.push(parseFloat(v));
+    if (v === '' || v === null) {
+      missing.push(key);
+      features.push(0);
+    } else {
+      features.push(parseFloat(v));
+    }
   });
+
   if (missing.length > 0) {
     showError(`Please fill all fields. Missing: ${missing.slice(0,4).join(', ')}${missing.length > 4 ? ` and ${missing.length-4} more...` : ''}`);
     return;
   }
+
   setLoading(true);
   try {
     const res = await fetch('/predict', {
@@ -356,9 +469,9 @@ async function runPredict() {
 }
 
 const CLASS_CONFIG = {
-  'Hit':     { badgeClass:'badge-hit',  nameClass:'classname-hit',  fillClass:'fill-hit' },
-  'Average': { badgeClass:'badge-avg',  nameClass:'classname-avg',  fillClass:'fill-avg' },
-  'Flop':    { badgeClass:'badge-flop', nameClass:'classname-flop', fillClass:'fill-flop' },
+  'Hit':     { icon:'🏆', badgeClass:'badge-hit',  nameClass:'classname-hit',  fillClass:'fill-hit' },
+  'Average': { icon:'🎭', badgeClass:'badge-avg',  nameClass:'classname-avg',  fillClass:'fill-avg' },
+  'Flop':    { icon:'💀', badgeClass:'badge-flop', nameClass:'classname-flop', fillClass:'fill-flop' },
 };
 
 function renderResult(data) {
